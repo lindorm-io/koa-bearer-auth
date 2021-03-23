@@ -1,24 +1,11 @@
-import { APIError, HttpStatus, TPromise, getAuthorizationHeader } from "@lindorm-io/core";
-import { IKoaAppContext } from "@lindorm-io/koa";
-import { ITokenIssuerVerifyData, Permission, TokenIssuer, sanitiseToken } from "@lindorm-io/jwt";
-
-export interface IKoaBearerAuthContext extends IKoaAppContext {
-  issuer: {
-    tokenIssuer: TokenIssuer;
-  };
-  token: {
-    bearer: ITokenIssuerVerifyData;
-  };
-}
-
-export interface IBearerTokenMiddlewareOptions {
-  audience: string;
-  issuer: string;
-}
+import { IBearerTokenMiddlewareOptions, IKoaBearerAuthContext, TNext } from "../types";
+import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
+import { Permission, sanitiseToken } from "@lindorm-io/jwt";
+import { getAuthorizationHeader } from "@lindorm-io/core";
 
 export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions) => async (
   ctx: IKoaBearerAuthContext,
-  next: TPromise<void>,
+  next: TNext,
 ): Promise<void> => {
   const start = Date.now();
 
@@ -27,11 +14,7 @@ export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions) => 
   const authorization = getAuthorizationHeader(ctx.get("Authorization"));
 
   if (authorization.type !== "Bearer") {
-    throw new APIError("Invalid Authorization Header", {
-      details: "Expected header to be: Bearer",
-      publicData: { header: authorization.type },
-      statusCode: HttpStatus.ClientError.BAD_REQUEST,
-    });
+    throw new InvalidAuthorizationHeaderError(authorization.type);
   }
 
   const token = authorization.value;
@@ -47,14 +30,7 @@ export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions) => 
   });
 
   if (verified.permission && verified.permission === Permission.LOCKED) {
-    throw new APIError("Invalid Bearer Token", {
-      details: "Subject is locked",
-      publicData: {
-        subject: verified.subject,
-        permission: verified.permission,
-      },
-      statusCode: HttpStatus.ClientError.FORBIDDEN,
-    });
+    throw new InvalidBearerTokenError(verified.subject, verified.permission);
   }
 
   ctx.token = {

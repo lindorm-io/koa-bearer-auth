@@ -9,6 +9,7 @@ npm install --save @lindorm-io/koa-bearer-auth
 ### Peer Dependencies
 This package has the following peer dependencies: 
 * [@lindorm-io/jwt](https://www.npmjs.com/package/@lindorm-io/jwt)
+* [@lindorm-io/key-pair](https://www.npmjs.com/package/@lindorm-io/key-pair)
 * [@lindorm-io/koa](https://www.npmjs.com/package/@lindorm-io/koa)
 
 ## Usage

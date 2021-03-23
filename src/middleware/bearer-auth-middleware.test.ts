@@ -1,8 +1,10 @@
-import { KeyPair, Keystore } from "@lindorm-io/key-pair";
+import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
 import { InvalidTokenClientError, InvalidTokenDeviceError, TokenIssuer } from "@lindorm-io/jwt";
+import { KeyPair, Keystore } from "@lindorm-io/key-pair";
+import { MissingAuthorizationHeaderError } from "@lindorm-io/core";
+import { Permission } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { v4 as uuid } from "uuid";
-import { Permission } from "@lindorm-io/jwt";
 
 const EC_PRIVATE_KEY =
   "-----BEGIN PRIVATE KEY-----\n" +
@@ -108,33 +110,25 @@ describe("bearer-token-middlware.ts", () => {
   test("should throw error on wrong client metadata", async () => {
     ctx.metadata.clientId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toStrictEqual(expect.any(InvalidTokenClientError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenClientError));
   });
 
   test("should throw error on wrong device metadata", async () => {
     ctx.metadata.deviceId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toStrictEqual(expect.any(InvalidTokenDeviceError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenDeviceError));
   });
 
   test("should throw error on missing authorization header", async () => {
     ctx.get = jest.fn(() => undefined);
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toStrictEqual(
-      expect.objectContaining({
-        message: "Missing Authorization Header",
-      }),
-    );
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(MissingAuthorizationHeaderError));
   });
 
   test("should throw error on missing Bearer Token Auth", async () => {
     ctx.get = jest.fn(() => "Basic STRING");
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toStrictEqual(
-      expect.objectContaining({
-        message: "Invalid Authorization Header",
-      }),
-    );
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidAuthorizationHeaderError));
   });
 
   test("should throw error on erroneous token verification", async () => {
@@ -156,10 +150,6 @@ describe("bearer-token-middlware.ts", () => {
       get: jest.fn(() => `Bearer ${newToken}`),
     };
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toStrictEqual(
-      expect.objectContaining({
-        message: "Invalid Bearer Token",
-      }),
-    );
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidBearerTokenError));
   });
 });
