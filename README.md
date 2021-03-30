@@ -21,7 +21,9 @@ This package has the following peer dependencies:
 Prerequisite is to add a token issuer on the context. It can be done with the tokenIssuerMiddleware
 ```typescript
 koaApp.addMiddleware(tokenIssuerMiddleware({
-  issuer: "https://authentication.service/",
+  issuer: "https://authentication.service/", // used for token validation
+  issuerName: "auth", // used to store issuer on context
+  keystoreName: "auth", // used to find the keystore on context
 }));
 ```
 
@@ -30,5 +32,6 @@ Once the token issuer exists on the context, the middleware is ready to be used
 koaApp.addMiddleware(bearerAuthMiddleware({
   audience : "access",
   issuer : "https://authentication.service/",
+  issuerName: "auth", // used to find issuer on context
 }));
 ```
