@@ -1,14 +1,18 @@
-import { IBearerTokenMiddlewareOptions, IKoaBearerAuthContext } from "../types";
+import { BearerAuthContext } from "../types";
 import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
-import { Middleware } from "koa";
 import { Permission, sanitiseToken } from "@lindorm-io/jwt";
-import { TNext } from "@lindorm-io/koa";
-import { getAuthorizationHeader } from "@lindorm-io/core";
+import { getAuthorizationHeader, Middleware } from "@lindorm-io/koa";
 
-export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions): Middleware => {
+interface Options {
+  audience: string;
+  issuer: string;
+  issuerName: string;
+}
+
+export const bearerAuthMiddleware = (options: Options): Middleware<BearerAuthContext> => {
   const { audience, issuer, issuerName } = options;
 
-  return async (ctx: IKoaBearerAuthContext, next: TNext): Promise<void> => {
+  return async (ctx, next): Promise<void> => {
     const start = Date.now();
     const authorization = getAuthorizationHeader(ctx.get("Authorization"));
 
@@ -22,8 +26,8 @@ export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions): Mi
 
     const verified = ctx.issuer[issuerName].verify({
       audience,
-      clientId: ctx.metadata.clientId,
-      deviceId: ctx.metadata.deviceId,
+      clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
+      deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
       issuer,
       token,
     });
@@ -37,10 +41,7 @@ export const bearerAuthMiddleware = (options: IBearerTokenMiddlewareOptions): Mi
       bearer: verified,
     };
 
-    ctx.metrics = {
-      ...(ctx.metrics || {}),
-      bearerToken: Date.now() - start,
-    };
+    ctx.metrics.bearerToken = Date.now() - start;
 
     await next();
   };

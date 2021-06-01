@@ -1,11 +1,11 @@
-import { IKoaAppContext } from "@lindorm-io/koa";
 import { ITokenIssuerVerifyData, TokenIssuer } from "@lindorm-io/jwt";
+import { KoaContext } from "@lindorm-io/koa";
 
-export interface IKoaBearerAuthContext extends IKoaAppContext {
+export interface BearerAuthContext extends KoaContext {
   issuer: {
     [key: string]: TokenIssuer;
   };
   token: {
-    bearer: ITokenIssuerVerifyData;
+    bearer: ITokenIssuerVerifyData<unknown>;
   };
 }

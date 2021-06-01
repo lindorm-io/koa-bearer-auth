@@ -1,17 +1,16 @@
 import MockDate from "mockdate";
 import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
 import { InvalidTokenClientError, InvalidTokenDeviceError, TokenIssuer } from "@lindorm-io/jwt";
-import { MissingAuthorizationHeaderError } from "@lindorm-io/core";
+import { MissingAuthorizationHeaderError } from "@lindorm-io/koa";
 import { Permission } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { getTestKeystore, logger } from "../test";
 
-MockDate.set("2020-01-01 08:00:00.000");
+MockDate.set("2020-01-01T08:00:00.000Z");
 
 const tokenIssuer = new TokenIssuer({
   issuer: "mock-issuer",
   keystore: getTestKeystore(),
-  // @ts-ignore
   logger,
 });
 
@@ -54,12 +53,11 @@ describe("bearer-token-middlware.ts", () => {
   });
 
   test("should successfully validate bearer token auth", async () => {
-    await expect(bearerAuthMiddleware(options)(ctx, next)).resolves.toBe(undefined);
+    await expect(bearerAuthMiddleware(options)(ctx, next)).resolves.toBeUndefined();
 
     expect(ctx.token.bearer).toStrictEqual(
       expect.objectContaining({
         id,
-        level: 0,
         payload: { test: true },
         subject: "mock-subject",
       }),
@@ -69,7 +67,7 @@ describe("bearer-token-middlware.ts", () => {
   test("should successfully validate when metadata is missing", async () => {
     ctx.metadata = {};
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).resolves.toBe(undefined);
+    await expect(bearerAuthMiddleware(options)(ctx, next)).resolves.toBeUndefined();
   });
 
   test("should throw error on wrong client metadata", async () => {

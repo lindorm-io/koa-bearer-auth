@@ -2,7 +2,7 @@ import { APIError } from "@lindorm-io/errors";
 import { HttpStatus } from "@lindorm-io/core";
 
 export class InvalidAuthorizationHeaderError extends APIError {
-  constructor(type: string) {
+  public constructor(type: string) {
     super("Invalid Authorization Header", {
       details: "Expected header to be: Bearer",
       publicData: { type },

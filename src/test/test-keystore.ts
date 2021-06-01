@@ -1,11 +1,13 @@
-import { Algorithm, KeyPair, Keystore, KeyType } from "@lindorm-io/key-pair";
+import { Algorithm, KeyPair, KeyType, Keystore, NamedCurve } from "@lindorm-io/key-pair";
 
 export const getTestKeystore = (): Keystore =>
   new Keystore({
     keys: [
       new KeyPair({
-        algorithm: Algorithm.ES512,
-        allowed: true,
+        id: "7531da89-12e9-403e-925a-5da49100635c",
+        type: KeyType.EC,
+        algorithms: [Algorithm.ES512],
+        namedCurve: NamedCurve.P521,
         privateKey:
           "-----BEGIN PRIVATE KEY-----\n" +
           "MIHuAgEAMBAGByqGSM49AgEGBSuBBAAjBIHWMIHTAgEBBEIBGma7xGZpaAngFXf3\n" +
@@ -22,7 +24,6 @@ export const getTestKeystore = (): Keystore =>
           "1bjATvi0uqXrF/bwPEE9S41++V6tiJ5y2NVU6HjZsZLjPqA2YKhzmMM31Ibvs2Wg\n" +
           "OQLhJKj4uO0wPYgkmFU=\n" +
           "-----END PUBLIC KEY-----\n",
-        type: KeyType.EC,
       }),
     ],
   });
