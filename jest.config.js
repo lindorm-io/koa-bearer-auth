@@ -10,8 +10,10 @@ module.exports = {
   ],
   coverageDirectory: "./coverage",
   coverageReporters: ["lcov"],
+  globalSetup: "./jest.global.setup.js",
   roots: ["src"],
   setupFiles: [],
   setupFilesAfterEnv: ["jest-extended"],
+  testEnvironment: "node",
   transform: { "^.+\\.tsx?$": "ts-jest" },
 };
