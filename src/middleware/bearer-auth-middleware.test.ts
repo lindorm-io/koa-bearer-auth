@@ -1,7 +1,6 @@
 import MockDate from "mockdate";
 import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
 import { InvalidTokenClientError, InvalidTokenDeviceError, TokenIssuer } from "@lindorm-io/jwt";
-import { MissingAuthorizationHeaderError } from "@lindorm-io/koa";
 import { Permission } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { getTestKeystore, logger } from "../test";
@@ -23,10 +22,11 @@ const { id, token } = tokenIssuer.sign({
   payload: { test: true },
 });
 
+const next = () => Promise.resolve();
+
 describe("bearer-token-middlware.ts", () => {
   let options: any;
   let ctx: any;
-  let next: any;
 
   beforeEach(() => {
     options = {
@@ -35,11 +35,14 @@ describe("bearer-token-middlware.ts", () => {
       issuerName: "issuerName",
     };
     ctx = {
-      get: jest.fn(() => `Bearer ${token}`),
+      getAuthorization: () => ({
+        type: "Bearer",
+        value: token,
+      }),
       logger: {
         debug: jest.fn(),
       },
-      issuer: {
+      jwt: {
         issuerName: tokenIssuer,
       },
       metadata: {
@@ -49,7 +52,6 @@ describe("bearer-token-middlware.ts", () => {
       metrics: {},
       token: {},
     };
-    next = () => Promise.resolve();
   });
 
   test("should successfully validate bearer token auth", async () => {
@@ -82,20 +84,20 @@ describe("bearer-token-middlware.ts", () => {
     await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenDeviceError));
   });
 
-  test("should throw error on missing authorization header", async () => {
-    ctx.get = jest.fn(() => undefined);
-
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(MissingAuthorizationHeaderError));
-  });
-
   test("should throw error on missing Bearer Token Auth", async () => {
-    ctx.get = jest.fn(() => "Basic STRING");
+    ctx.getAuthorization = () => ({
+      type: "Basic",
+      value: "base64",
+    });
 
     await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidAuthorizationHeaderError));
   });
 
   test("should throw error on erroneous token verification", async () => {
-    ctx.get = jest.fn(() => "Bearer wrong.wrong.wrong");
+    ctx.getAuthorization = () => ({
+      type: "Bearer",
+      value: "jwt.jwt.jwt",
+    });
 
     await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow();
   });
@@ -108,10 +110,10 @@ describe("bearer-token-middlware.ts", () => {
       subject: "mock-subject",
     });
 
-    ctx = {
-      ...ctx,
-      get: jest.fn(() => `Bearer ${newToken}`),
-    };
+    ctx.getAuthorization = () => ({
+      type: "Bearer",
+      value: newToken,
+    });
 
     await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidBearerTokenError));
   });
