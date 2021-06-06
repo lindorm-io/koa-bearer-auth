@@ -1,20 +1,26 @@
 import MockDate from "mockdate";
 import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
-import { InvalidTokenClientError, InvalidTokenDeviceError, TokenIssuer } from "@lindorm-io/jwt";
+import { Metric } from "@lindorm-io/koa";
 import { Permission } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { getTestKeystore, logger } from "../test";
+import {
+  InvalidTokenAudienceError,
+  InvalidTokenClientError,
+  InvalidTokenDeviceError,
+  TokenIssuer,
+} from "@lindorm-io/jwt";
 
 MockDate.set("2020-01-01T08:00:00.000Z");
 
 const tokenIssuer = new TokenIssuer({
-  issuer: "mock-issuer",
+  issuer: "https://auth.lindorm.io/",
   keystore: getTestKeystore(),
   logger,
 });
 
 const { id, token } = tokenIssuer.sign({
-  audience: "mock-audience",
+  audience: "access",
   clientId: "clientId",
   deviceId: "deviceId",
   expiry: "99 seconds",
@@ -30,28 +36,22 @@ describe("bearer-token-middlware.ts", () => {
 
   beforeEach(() => {
     options = {
-      audience: "mock-audience",
-      issuer: "mock-issuer",
+      audience: "access",
+      issuer: "https://auth.lindorm.io/",
       issuerName: "issuerName",
     };
     ctx = {
-      getAuthorization: () => ({
-        type: "Bearer",
-        value: token,
-      }),
-      logger: {
-        debug: jest.fn(),
-      },
-      jwt: {
-        issuerName: tokenIssuer,
-      },
-      metadata: {
-        clientId: "clientId",
-        deviceId: "deviceId",
-      },
+      jwt: tokenIssuer,
+      logger,
+      metadata: { clientId: "clientId", deviceId: "deviceId" },
       metrics: {},
       token: {},
     };
+    ctx.getAuthorization = () => ({
+      type: "Bearer",
+      value: token,
+    });
+    ctx.getMetric = (key: string) => new Metric(ctx, key);
   });
 
   test("should successfully validate bearer token auth", async () => {
@@ -102,9 +102,24 @@ describe("bearer-token-middlware.ts", () => {
     await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow();
   });
 
+  test("should throw error on invalid audience", async () => {
+    const { token: newToken } = tokenIssuer.sign({
+      audience: "wrong",
+      expiry: "99 seconds",
+      subject: "mock-subject",
+    });
+
+    ctx.getAuthorization = () => ({
+      type: "Bearer",
+      value: newToken,
+    });
+
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenAudienceError));
+  });
+
   test("should throw error on locked permission", async () => {
     const { token: newToken } = tokenIssuer.sign({
-      audience: "mock-audience",
+      audience: "access",
       permission: Permission.LOCKED,
       expiry: "99 seconds",
       subject: "mock-subject",

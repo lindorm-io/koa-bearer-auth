@@ -1,18 +1,16 @@
 import { BearerAuthContext } from "../types";
 import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
-import { Permission, sanitiseToken } from "@lindorm-io/jwt";
 import { Middleware } from "@lindorm-io/koa";
+import { Permission, sanitiseToken } from "@lindorm-io/jwt";
 
 interface Options {
-  audience: string;
   issuer: string;
-  issuerName: string;
 }
 
 export const bearerAuthMiddleware =
   (options: Options): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
-    const start = Date.now();
+    const metric = ctx.getMetric("token");
 
     const authorization = ctx.getAuthorization();
 
@@ -22,8 +20,8 @@ export const bearerAuthMiddleware =
 
     ctx.logger.debug("Bearer Token Auth identified", { token: sanitiseToken(authorization.value) });
 
-    ctx.token.bearer = ctx.jwt[options.issuerName].verify({
-      audience: options.audience,
+    ctx.token.bearer = ctx.jwt.verify({
+      audience: "access",
       clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
       deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
       issuer: options.issuer,
@@ -34,7 +32,7 @@ export const bearerAuthMiddleware =
       throw new InvalidBearerTokenError(ctx.token.bearer.subject, ctx.token.bearer.permission);
     }
 
-    ctx.metrics.token = (ctx.metrics.token || 0) + (Date.now() - start);
+    metric.end();
 
     await next();
   };
