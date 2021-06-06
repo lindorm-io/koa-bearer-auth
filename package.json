@@ -45,17 +45,17 @@
     "@lindorm-io/errors": "^0.0.1"
   },
   "peerDependencies": {
-    "@lindorm-io/jwt": ">=0.2.3",
-    "@lindorm-io/key-pair": ">=0.2.7",
-    "@lindorm-io/koa": ">=0.2.15",
-    "@lindorm-io/koa-jwt": ">=0.3.2",
+    "@lindorm-io/jwt": ">=0.2.4",
+    "@lindorm-io/key-pair": ">=0.2.9",
+    "@lindorm-io/koa": ">=0.2.19",
+    "@lindorm-io/koa-jwt": ">=0.3.5",
     "@lindorm-io/winston": ">=0.1.5"
   },
   "devDependencies": {
-    "@lindorm-io/jwt": "^0.2.3",
-    "@lindorm-io/key-pair": "^0.2.7",
-    "@lindorm-io/koa": "^0.2.15",
-    "@lindorm-io/koa-jwt": "^0.3.2",
+    "@lindorm-io/jwt": "^0.2.4",
+    "@lindorm-io/key-pair": "^0.2.9",
+    "@lindorm-io/koa": "^0.2.19",
+    "@lindorm-io/koa-jwt": "^0.3.5",
     "@lindorm-io/winston": "^0.1.5",
     "@types/jest": "^26.0.23",
     "@types/jsonwebtoken": "^8.5.1",
