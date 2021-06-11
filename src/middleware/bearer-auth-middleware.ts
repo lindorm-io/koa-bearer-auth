@@ -1,7 +1,7 @@
 import { BearerAuthContext } from "../types";
-import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
 import { Middleware } from "@lindorm-io/koa";
 import { Permission, sanitiseToken } from "@lindorm-io/jwt";
+import { ClientError } from "@lindorm-io/errors";
 
 interface Options {
   issuer: string;
@@ -10,12 +10,17 @@ interface Options {
 export const bearerAuthMiddleware =
   (options: Options): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
-    const metric = ctx.getMetric("token");
+    const metric = ctx.getMetric("auth");
 
     const authorization = ctx.getAuthorization();
 
     if (authorization?.type !== "Bearer") {
-      throw new InvalidAuthorizationHeaderError(authorization.type);
+      metric.end();
+
+      throw new ClientError("Invalid Authorization", {
+        description: "Expected: Bearer",
+        statusCode: ClientError.StatusCode.UNAUTHORIZED,
+      });
     }
 
     ctx.logger.debug("Bearer Token Auth identified", { token: sanitiseToken(authorization.value) });
@@ -29,7 +34,16 @@ export const bearerAuthMiddleware =
     });
 
     if (ctx.token.bearer.permission && ctx.token.bearer.permission === Permission.LOCKED) {
-      throw new InvalidBearerTokenError(ctx.token.bearer.subject, ctx.token.bearer.permission);
+      metric.end();
+
+      throw new ClientError("Invalid Authorization", {
+        debug: {
+          subject: ctx.token.bearer.subject,
+          permission: ctx.token.bearer.permission,
+        },
+        description: "Invalid permission",
+        statusCode: ClientError.StatusCode.UNAUTHORIZED,
+      });
     }
 
     metric.end();

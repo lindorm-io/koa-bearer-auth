@@ -42,19 +42,19 @@
   },
   "dependencies": {
     "@lindorm-io/core": "^0.2.4",
-    "@lindorm-io/errors": "^0.0.1"
+    "@lindorm-io/errors": "^0.1.5"
   },
   "peerDependencies": {
-    "@lindorm-io/jwt": ">=0.2.4",
-    "@lindorm-io/key-pair": ">=0.2.9",
-    "@lindorm-io/koa": ">=0.2.19",
+    "@lindorm-io/jwt": ">=0.2.5",
+    "@lindorm-io/key-pair": ">=0.2.10",
+    "@lindorm-io/koa": ">=0.2.20",
     "@lindorm-io/koa-jwt": ">=0.3.5",
     "@lindorm-io/winston": ">=0.1.5"
   },
   "devDependencies": {
-    "@lindorm-io/jwt": "^0.2.4",
-    "@lindorm-io/key-pair": "^0.2.9",
-    "@lindorm-io/koa": "^0.2.19",
+    "@lindorm-io/jwt": "^0.2.5",
+    "@lindorm-io/key-pair": "^0.2.10",
+    "@lindorm-io/koa": "^0.2.20",
     "@lindorm-io/koa-jwt": "^0.3.5",
     "@lindorm-io/winston": "^0.1.5",
     "@types/jest": "^26.0.23",
@@ -65,8 +65,8 @@
     "@types/lodash": "^4.14.170",
     "@types/node": "15.6.2",
     "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "@typescript-eslint/parser": "^4.26.1",
     "eslint": "^7.28.0",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
@@ -76,7 +76,7 @@
     "mockdate": "^3.0.5",
     "prettier": "2.3.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^27.0.2",
+    "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.2"
   }

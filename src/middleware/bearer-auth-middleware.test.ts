@@ -1,15 +1,10 @@
 import MockDate from "mockdate";
-import { InvalidAuthorizationHeaderError, InvalidBearerTokenError } from "../errors";
+import { ClientError } from "@lindorm-io/errors";
 import { Metric } from "@lindorm-io/koa";
-import { Permission } from "@lindorm-io/jwt";
+import { Permission, TokenError } from "@lindorm-io/jwt";
+import { TokenIssuer } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { getTestKeystore, logger } from "../test";
-import {
-  InvalidTokenAudienceError,
-  InvalidTokenClientError,
-  InvalidTokenDeviceError,
-  TokenIssuer,
-} from "@lindorm-io/jwt";
 
 MockDate.set("2020-01-01T08:00:00.000Z");
 
@@ -75,13 +70,13 @@ describe("bearer-token-middlware.ts", () => {
   test("should throw error on wrong client metadata", async () => {
     ctx.metadata.clientId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenClientError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
   });
 
   test("should throw error on wrong device metadata", async () => {
     ctx.metadata.deviceId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenDeviceError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
   });
 
   test("should throw error on missing Bearer Token Auth", async () => {
@@ -90,7 +85,7 @@ describe("bearer-token-middlware.ts", () => {
       value: "base64",
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidAuthorizationHeaderError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(ClientError));
   });
 
   test("should throw error on erroneous token verification", async () => {
@@ -114,7 +109,7 @@ describe("bearer-token-middlware.ts", () => {
       value: newToken,
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidTokenAudienceError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
   });
 
   test("should throw error on locked permission", async () => {
@@ -130,6 +125,6 @@ describe("bearer-token-middlware.ts", () => {
       value: newToken,
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(InvalidBearerTokenError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(ClientError));
   });
 });
