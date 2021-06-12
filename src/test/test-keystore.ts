@@ -5,8 +5,9 @@ export const getTestKeystore = (): Keystore =>
     keys: [
       new KeyPair({
         id: "7531da89-12e9-403e-925a-5da49100635c",
-        type: KeyType.EC,
         algorithms: [Algorithm.ES512],
+        allowed: new Date("2020-01-01T09:00:00.000Z"),
+        created: new Date("2020-01-01T08:00:00.000Z"),
         namedCurve: NamedCurve.P521,
         privateKey:
           "-----BEGIN PRIVATE KEY-----\n" +
@@ -24,6 +25,7 @@ export const getTestKeystore = (): Keystore =>
           "1bjATvi0uqXrF/bwPEE9S41++V6tiJ5y2NVU6HjZsZLjPqA2YKhzmMM31Ibvs2Wg\n" +
           "OQLhJKj4uO0wPYgkmFU=\n" +
           "-----END PUBLIC KEY-----\n",
+        type: KeyType.EC,
       }),
     ],
   });

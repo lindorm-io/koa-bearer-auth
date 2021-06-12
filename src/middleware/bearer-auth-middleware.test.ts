@@ -1,12 +1,12 @@
 import MockDate from "mockdate";
 import { ClientError } from "@lindorm-io/errors";
 import { Metric } from "@lindorm-io/koa";
-import { Permission, TokenError } from "@lindorm-io/jwt";
+import { Permission } from "@lindorm-io/jwt";
 import { TokenIssuer } from "@lindorm-io/jwt";
 import { bearerAuthMiddleware } from "./bearer-auth-middleware";
 import { getTestKeystore, logger } from "../test";
 
-MockDate.set("2020-01-01T08:00:00.000Z");
+MockDate.set("2021-01-01T08:00:00.000Z");
 
 const tokenIssuer = new TokenIssuer({
   issuer: "https://auth.lindorm.io/",
@@ -25,7 +25,7 @@ const { id, token } = tokenIssuer.sign({
 
 const next = () => Promise.resolve();
 
-describe("bearer-token-middlware.ts", () => {
+describe("bearerAuthMiddleware", () => {
   let options: any;
   let ctx: any;
 
@@ -70,13 +70,13 @@ describe("bearer-token-middlware.ts", () => {
   test("should throw error on wrong client metadata", async () => {
     ctx.metadata.clientId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 
   test("should throw error on wrong device metadata", async () => {
     ctx.metadata.deviceId = "wrong";
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 
   test("should throw error on missing Bearer Token Auth", async () => {
@@ -85,7 +85,7 @@ describe("bearer-token-middlware.ts", () => {
       value: "base64",
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(ClientError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 
   test("should throw error on erroneous token verification", async () => {
@@ -94,7 +94,7 @@ describe("bearer-token-middlware.ts", () => {
       value: "jwt.jwt.jwt",
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow();
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 
   test("should throw error on invalid audience", async () => {
@@ -109,7 +109,7 @@ describe("bearer-token-middlware.ts", () => {
       value: newToken,
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(TokenError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 
   test("should throw error on locked permission", async () => {
@@ -125,6 +125,6 @@ describe("bearer-token-middlware.ts", () => {
       value: newToken,
     });
 
-    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(expect.any(ClientError));
+    await expect(bearerAuthMiddleware(options)(ctx, next)).rejects.toThrow(ClientError);
   });
 });

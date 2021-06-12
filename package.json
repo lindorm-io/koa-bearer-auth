@@ -41,22 +41,22 @@
     "validate": "npm run test:clear && npm run check:lint && npm run check:types && npm test"
   },
   "dependencies": {
-    "@lindorm-io/core": "^0.2.4",
+    "@lindorm-io/core": "^0.2.5",
     "@lindorm-io/errors": "^0.1.5"
   },
   "peerDependencies": {
-    "@lindorm-io/jwt": ">=0.2.5",
-    "@lindorm-io/key-pair": ">=0.2.10",
-    "@lindorm-io/koa": ">=0.2.20",
+    "@lindorm-io/jwt": ">=0.2.6",
+    "@lindorm-io/key-pair": ">=0.2.11",
+    "@lindorm-io/koa": ">=0.2.21",
     "@lindorm-io/koa-jwt": ">=0.3.5",
-    "@lindorm-io/winston": ">=0.1.5"
+    "@lindorm-io/winston": ">=0.1.6"
   },
   "devDependencies": {
-    "@lindorm-io/jwt": "^0.2.5",
-    "@lindorm-io/key-pair": "^0.2.10",
-    "@lindorm-io/koa": "^0.2.20",
+    "@lindorm-io/jwt": "^0.2.6",
+    "@lindorm-io/key-pair": "^0.2.11",
+    "@lindorm-io/koa": "^0.2.21",
     "@lindorm-io/koa-jwt": "^0.3.5",
-    "@lindorm-io/winston": "^0.1.5",
+    "@lindorm-io/winston": "^0.1.6",
     "@types/jest": "^26.0.23",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/koa": "^2.13.3",

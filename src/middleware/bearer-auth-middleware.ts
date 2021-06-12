@@ -25,13 +25,17 @@ export const bearerAuthMiddleware =
 
     ctx.logger.debug("Bearer Token Auth identified", { token: sanitiseToken(authorization.value) });
 
-    ctx.token.bearer = ctx.jwt.verify({
-      audience: "access",
-      clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
-      deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
-      issuer: options.issuer,
-      token: authorization.value,
-    });
+    try {
+      ctx.token.bearer = ctx.jwt.verify({
+        audience: "access",
+        clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
+        deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
+        issuer: options.issuer,
+        token: authorization.value,
+      });
+    } catch (err) {
+      throw new ClientError("Invalid Authorization", { error: err });
+    }
 
     if (ctx.token.bearer.permission && ctx.token.bearer.permission === Permission.LOCKED) {
       metric.end();
