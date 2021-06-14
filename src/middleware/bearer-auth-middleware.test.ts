@@ -52,7 +52,7 @@ describe("bearerAuthMiddleware", () => {
   test("should successfully validate bearer token auth", async () => {
     await expect(bearerAuthMiddleware(options)(ctx, next)).resolves.toBeUndefined();
 
-    expect(ctx.token.bearer).toStrictEqual(
+    expect(ctx.token.bearerToken).toStrictEqual(
       expect.objectContaining({
         id,
         payload: { test: true },

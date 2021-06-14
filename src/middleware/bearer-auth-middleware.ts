@@ -26,7 +26,7 @@ export const bearerAuthMiddleware =
     ctx.logger.debug("Bearer Token Auth identified", { token: sanitiseToken(authorization.value) });
 
     try {
-      ctx.token.bearer = ctx.jwt.verify({
+      ctx.token.bearerToken = ctx.jwt.verify({
         audience: "access",
         clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
         deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
@@ -37,13 +37,13 @@ export const bearerAuthMiddleware =
       throw new ClientError("Invalid Authorization", { error: err });
     }
 
-    if (ctx.token.bearer.permission && ctx.token.bearer.permission === Permission.LOCKED) {
+    if (ctx.token.bearerToken.permission && ctx.token.bearerToken.permission === Permission.LOCKED) {
       metric.end();
 
       throw new ClientError("Invalid Authorization", {
         debug: {
-          subject: ctx.token.bearer.subject,
-          permission: ctx.token.bearer.permission,
+          subject: ctx.token.bearerToken.subject,
+          permission: ctx.token.bearerToken.permission,
         },
         description: "Invalid permission",
         statusCode: ClientError.StatusCode.UNAUTHORIZED,
