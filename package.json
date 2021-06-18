@@ -42,21 +42,21 @@
   },
   "dependencies": {
     "@lindorm-io/core": "^0.2.5",
-    "@lindorm-io/errors": "^0.1.5"
+    "@lindorm-io/errors": "^0.1.6"
   },
   "peerDependencies": {
-    "@lindorm-io/jwt": ">=0.2.6",
-    "@lindorm-io/key-pair": ">=0.2.11",
-    "@lindorm-io/koa": ">=0.2.21",
-    "@lindorm-io/koa-jwt": ">=0.3.5",
-    "@lindorm-io/winston": ">=0.1.6"
+    "@lindorm-io/jwt": ">=0.2.10",
+    "@lindorm-io/key-pair": ">=0.3.1",
+    "@lindorm-io/koa": ">=0.2.24",
+    "@lindorm-io/koa-jwt": ">=0.3.11",
+    "@lindorm-io/winston": ">=0.1.7"
   },
   "devDependencies": {
-    "@lindorm-io/jwt": "^0.2.6",
-    "@lindorm-io/key-pair": "^0.2.11",
-    "@lindorm-io/koa": "^0.2.21",
-    "@lindorm-io/koa-jwt": "^0.3.5",
-    "@lindorm-io/winston": "^0.1.6",
+    "@lindorm-io/jwt": "^0.2.10",
+    "@lindorm-io/key-pair": "^0.3.1",
+    "@lindorm-io/koa": "^0.2.24",
+    "@lindorm-io/koa-jwt": "^0.3.11",
+    "@lindorm-io/winston": "^0.1.7",
     "@types/jest": "^26.0.23",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/koa": "^2.13.3",
@@ -65,8 +65,8 @@
     "@types/lodash": "^4.14.170",
     "@types/node": "15.6.2",
     "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.26.1",
-    "@typescript-eslint/parser": "^4.26.1",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
     "eslint": "^7.28.0",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
@@ -78,6 +78,6 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.4"
   }
 }
