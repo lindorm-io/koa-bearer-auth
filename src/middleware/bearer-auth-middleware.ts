@@ -1,43 +1,54 @@
 import { BearerAuthContext } from "../types";
-import { Middleware } from "@lindorm-io/koa";
-import { sanitiseToken } from "@lindorm-io/jwt";
 import { ClientError } from "@lindorm-io/errors";
-import { includes } from "lodash";
+import { Middleware } from "@lindorm-io/koa";
+import { TokenIssuer } from "@lindorm-io/jwt";
 
-interface Options {
+interface MiddlewareOptions {
+  audience?: string | Array<string>;
   issuer: string;
 }
 
+interface Options {
+  maxAge?: string;
+  scope?: Array<string>;
+  subject?: string;
+}
+
 export const bearerAuthMiddleware =
-  (options: Options) =>
-  (requiredScope?: Array<string>): Middleware<BearerAuthContext> =>
+  (middlewareOptions: MiddlewareOptions) =>
+  (options: Options = {}): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
-    const authorization = ctx.getAuthorization();
+    const { audience, issuer } = middlewareOptions;
+    const { maxAge, scope, subject } = options;
 
-    if (authorization?.type !== "Bearer") {
+    const { type, value: token } = ctx.getAuthorization() || {};
+
+    if (type !== "Bearer") {
       metric.end();
 
       throw new ClientError("Invalid Authorization", {
+        debug: { type, token },
         description: "Expected: Bearer",
         statusCode: ClientError.StatusCode.UNAUTHORIZED,
       });
     }
 
-    ctx.logger.debug("Bearer Token Auth identified", { token: sanitiseToken(authorization.value) });
-
     try {
-      ctx.token.bearerToken = ctx.jwt.verify({
-        audience: "access",
-        clientId: ctx.metadata.clientId,
-        deviceId: ctx.metadata.deviceId,
-        issuer: options.issuer,
-        token: authorization.value,
+      ctx.token.bearerToken = ctx.jwt.verify(token, {
+        audience,
+        clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
+        deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
+        issuer,
+        maxAge,
+        scope,
+        subject,
+        type: "access",
       });
 
-      ctx.logger.debug("Token validated", {
-        bearerToken: sanitiseToken(authorization.value),
+      ctx.logger.debug("Bearer token validated", {
+        bearerToken: TokenIssuer.sanitiseToken(token),
       });
     } catch (err) {
       metric.end();
@@ -45,38 +56,6 @@ export const bearerAuthMiddleware =
       throw new ClientError("Invalid Authorization", {
         error: err,
         description: "Bearer token is invalid",
-      });
-    }
-
-    if (ctx.token.bearerToken.permission && ctx.token.bearerToken.permission === "locked") {
-      metric.end();
-
-      throw new ClientError("Invalid Authorization", {
-        debug: {
-          subject: ctx.token.bearerToken.subject,
-          permission: ctx.token.bearerToken.permission,
-        },
-        description: "Invalid permission",
-        statusCode: ClientError.StatusCode.UNAUTHORIZED,
-      });
-    }
-
-    if (!requiredScope?.length) {
-      metric.end();
-      return await next();
-    }
-
-    for (const scope of requiredScope) {
-      if (includes(ctx.token.bearerToken.scope, scope)) continue;
-
-      throw new ClientError("Scope conflict", {
-        data: { scope },
-        debug: {
-          expect: requiredScope,
-          actual: ctx.token.bearerToken.scope,
-        },
-        description: "Expected scope not found on Bearer token",
-        statusCode: ClientError.StatusCode.CONFLICT,
       });
     }
 
