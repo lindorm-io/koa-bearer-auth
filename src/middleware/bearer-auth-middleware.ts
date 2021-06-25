@@ -10,7 +10,7 @@ interface MiddlewareOptions {
   maxAge?: string;
 }
 
-interface BearerAuthOptions {
+export interface BearerAuthOptions {
   nonce?: string;
   scope?: string;
   subject?: string;
