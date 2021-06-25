@@ -1,7 +1,7 @@
 {
   "name": "@lindorm-io/koa-bearer-auth",
   "description": "Bearer Auth middleware for @lindorm-io/koa applications",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "ISC",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
