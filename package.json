@@ -42,20 +42,21 @@
   },
   "dependencies": {
     "@lindorm-io/core": "^0.2.7",
-    "@lindorm-io/errors": "^0.1.9"
+    "@lindorm-io/errors": "^0.1.9",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "@lindorm-io/jwt": ">=0.3.2",
     "@lindorm-io/key-pair": ">=0.3.1",
-    "@lindorm-io/koa": ">=0.3.1",
-    "@lindorm-io/koa-jwt": ">=0.3.13",
+    "@lindorm-io/koa": ">=0.3.2",
+    "@lindorm-io/koa-jwt": ">=0.3.14",
     "@lindorm-io/winston": ">=0.1.7"
   },
   "devDependencies": {
     "@lindorm-io/jwt": "^0.3.2",
     "@lindorm-io/key-pair": "^0.3.1",
-    "@lindorm-io/koa": "^0.3.1",
-    "@lindorm-io/koa-jwt": "^0.3.13",
+    "@lindorm-io/koa": "^0.3.2",
+    "@lindorm-io/koa-jwt": "^0.3.14",
     "@lindorm-io/winston": "^0.1.7",
     "@types/jest": "^26.0.23",
     "@types/jsonwebtoken": "^8.5.2",

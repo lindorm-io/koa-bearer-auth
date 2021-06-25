@@ -18,20 +18,18 @@ This package has the following peer dependencies:
 
 ### Bearer Token Middleware
 
-Prerequisite is to add a token issuer on the context. It can be done with the tokenIssuerMiddleware
-```typescript
-koaApp.addMiddleware(tokenIssuerMiddleware({
-  issuer: "https://authentication.service/", // used for token validation
-  issuerName: "auth", // used to store issuer on context
-  keystoreName: "auth", // used to find the keystore on context
-}));
-```
+Prerequisite is to add [token issuer](https://www.npmjs.com/package/@lindorm-io/koa-jwt) to the context.
 
 Once the token issuer exists on the context, the middleware is ready to be used
 ```typescript
-koaApp.addMiddleware(bearerAuthMiddleware({
-  audience : "access",
-  issuer : "https://authentication.service/",
-  issuerName: "auth", // used to find issuer on context
+const middleware = bearerAuthMiddleware({
+  audience : "https://authentication.client/", // OPTIONAL | string | used in JWT validation
+  issuer : "https://authorization.service/", // REQURIED | uri | used for token validation
+  maxAge: "10 minutes", // OPTIONAL | string | used in JWT validation
+})
+router.use(middleware({
+  nonce: "entity.authorizationSession.nonce", // OPTIONAL | path | used in JWT validation
+  scope: "entity.refreshSession.scope", // OPTIONAL | path | used in JWT validation
+  subject: "entity.refreshSession.accountId", // OPTIONAL | path | used in JWT validation
 }));
 ```

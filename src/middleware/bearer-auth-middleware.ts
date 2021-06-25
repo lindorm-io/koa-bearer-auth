@@ -2,26 +2,28 @@ import { BearerAuthContext } from "../types";
 import { ClientError } from "@lindorm-io/errors";
 import { Middleware } from "@lindorm-io/koa";
 import { TokenIssuer } from "@lindorm-io/jwt";
+import { get } from "lodash";
 
 interface MiddlewareOptions {
-  audience?: string | Array<string>;
+  audience?: string;
   issuer: string;
+  maxAge?: string;
 }
 
-interface Options {
-  maxAge?: string;
-  scope?: Array<string>;
+interface BearerAuthOptions {
+  nonce?: string;
+  scope?: string;
   subject?: string;
 }
 
 export const bearerAuthMiddleware =
   (middlewareOptions: MiddlewareOptions) =>
-  (options: Options = {}): Middleware<BearerAuthContext> =>
+  (options: BearerAuthOptions = {}): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
-    const { audience, issuer } = middlewareOptions;
-    const { maxAge, scope, subject } = options;
+    const { audience, issuer, maxAge } = middlewareOptions;
+    const { nonce, scope, subject } = options;
 
     const { type, value: token } = ctx.getAuthorization() || {};
 
@@ -42,9 +44,10 @@ export const bearerAuthMiddleware =
         deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
         issuer,
         maxAge,
-        scope,
-        subject,
-        type: "access",
+        nonce: nonce ? get(ctx, nonce) : undefined,
+        scope: scope ? get(ctx, scope) : undefined,
+        subject: subject ? get(ctx, subject) : undefined,
+        type: "access_token",
       });
 
       ctx.logger.debug("Bearer token validated", {
