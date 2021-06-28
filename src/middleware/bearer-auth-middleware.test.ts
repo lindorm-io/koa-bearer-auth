@@ -16,39 +16,36 @@ describe("bearerAuthMiddleware", () => {
   beforeEach(() => {
     const jwt = getTestJwt();
     const { token } = jwt.sign({
-      audience: ["audience"],
-      clientId: "444a9836-d2c9-470e-9270-071bfcb61346",
-      deviceId: "87480227-f483-4450-83a6-3b4aa9c7e2a3",
+      audience: ["444a9836-d2c9-470e-9270-071bfcb61346"],
       expiry: "99 seconds",
       nonce: "6142a95bc7004df59e365e37516170a9",
-      scope: ["default", "edit"],
-      subject: "subject",
+      scopes: ["default", "edit"],
+      subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
       type: "access_token",
     });
 
     middlewareOptions = {
-      audience: "audience",
       issuer: "issuer",
       maxAge: "90 minutes",
     };
     options = {
       nonce: "request.body.nonce",
-      scope: "request.body.scope",
+      scopes: "request.body.scopes",
       subject: "request.body.subject",
     };
+
     ctx = {
       jwt,
       logger,
       metadata: {
         clientId: "444a9836-d2c9-470e-9270-071bfcb61346",
-        deviceId: "87480227-f483-4450-83a6-3b4aa9c7e2a3",
       },
       metrics: {},
       request: {
         body: {
           nonce: "6142a95bc7004df59e365e37516170a9",
-          scope: ["default"],
-          subject: "subject",
+          scopes: ["default"],
+          subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
         },
       },
       token: {},
@@ -66,7 +63,7 @@ describe("bearerAuthMiddleware", () => {
 
     expect(ctx.token.bearerToken).toStrictEqual(
       expect.objectContaining({
-        subject: "subject",
+        subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
         token: expect.any(String),
       }),
     );

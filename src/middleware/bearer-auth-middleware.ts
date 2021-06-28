@@ -5,14 +5,13 @@ import { TokenIssuer } from "@lindorm-io/jwt";
 import { get } from "lodash";
 
 interface MiddlewareOptions {
-  audience?: string;
   issuer: string;
   maxAge?: string;
 }
 
 export interface BearerAuthOptions {
   nonce?: string;
-  scope?: string;
+  scopes?: string;
   subject?: string;
 }
 
@@ -22,8 +21,8 @@ export const bearerAuthMiddleware =
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
-    const { audience, issuer, maxAge } = middlewareOptions;
-    const { nonce, scope, subject } = options;
+    const { issuer, maxAge } = middlewareOptions;
+    const { nonce, scopes, subject } = options;
 
     const { type, value: token } = ctx.getAuthorization() || {};
 
@@ -39,13 +38,11 @@ export const bearerAuthMiddleware =
 
     try {
       ctx.token.bearerToken = ctx.jwt.verify(token, {
-        audience,
-        clientId: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
-        deviceId: ctx.metadata.deviceId ? ctx.metadata.deviceId : undefined,
+        audience: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
         issuer,
         maxAge,
         nonce: nonce ? get(ctx, nonce) : undefined,
-        scope: scope ? get(ctx, scope) : undefined,
+        scopes: scopes ? get(ctx, scopes) : undefined,
         subject: subject ? get(ctx, subject) : undefined,
         type: "access_token",
       });
