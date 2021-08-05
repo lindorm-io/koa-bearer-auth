@@ -29,6 +29,7 @@ describe("bearerAuthMiddleware", () => {
       maxAge: "90 minutes",
     };
     options = {
+      audience: "metadata.clientId",
       nonce: "request.body.nonce",
       scopes: "request.body.scopes",
       subject: "request.body.subject",

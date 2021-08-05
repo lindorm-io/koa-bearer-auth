@@ -5,11 +5,14 @@ import { TokenIssuer } from "@lindorm-io/jwt";
 import { get } from "lodash";
 
 interface MiddlewareOptions {
+  clockTolerance?: number;
   issuer: string;
   maxAge?: string;
+  type?: Array<string>;
 }
 
 export interface BearerAuthOptions {
+  audience?: string;
   nonce?: string;
   scopes?: string;
   subject?: string;
@@ -21,16 +24,16 @@ export const bearerAuthMiddleware =
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
-    const { issuer, maxAge } = middlewareOptions;
-    const { nonce, scopes, subject } = options;
+    const { clockTolerance, issuer, maxAge, type } = middlewareOptions;
+    const { audience, nonce, scopes, subject } = options;
 
-    const { type, value: token } = ctx.getAuthorization() || {};
+    const { type: tokenType, value: token } = ctx.getAuthorization() || {};
 
-    if (type !== "Bearer") {
+    if (tokenType !== "Bearer") {
       metric.end();
 
       throw new ClientError("Invalid Authorization", {
-        debug: { type, token },
+        debug: { tokenType, token },
         description: "Expected: Bearer",
         statusCode: ClientError.StatusCode.UNAUTHORIZED,
       });
@@ -38,13 +41,14 @@ export const bearerAuthMiddleware =
 
     try {
       ctx.token.bearerToken = ctx.jwt.verify(token, {
-        audience: ctx.metadata.clientId ? ctx.metadata.clientId : undefined,
+        audience: audience ? get(ctx, audience) : undefined,
+        clockTolerance,
         issuer,
         maxAge,
         nonce: nonce ? get(ctx, nonce) : undefined,
         scopes: scopes ? get(ctx, scopes) : undefined,
         subject: subject ? get(ctx, subject) : undefined,
-        type: "access_token",
+        type: type || ["access_token"],
       });
 
       ctx.logger.debug("Bearer token validated", {
@@ -55,7 +59,8 @@ export const bearerAuthMiddleware =
 
       throw new ClientError("Invalid Authorization", {
         error: err,
-        description: "Bearer token is invalid",
+        debug: { middlewareOptions, options },
+        description: "bearerToken is invalid",
       });
     }
 

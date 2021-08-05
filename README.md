@@ -23,10 +23,13 @@ Prerequisite is to add [token issuer](https://www.npmjs.com/package/@lindorm-io/
 Once the token issuer exists on the context, the middleware is ready to be used
 ```typescript
 const middleware = bearerAuthMiddleware({
-  issuer : "https://authorization.service/", // REQURIED | uri | used for token validation
+  clockTolerance: 3, // OPTIONAL | number | giving some tolerance for time validation
+  issuer: "https://authorization.service/", // REQURIED | uri | used for token validation
   maxAge: "10 minutes", // OPTIONAL | string | used in JWT validation
+  type: "access_token", // OPTIONAL | string | token type
 })
 router.use(middleware({
+  audience: "metadata.clientId",
   nonce: "entity.authorizationSession.nonce", // OPTIONAL | path | used in JWT validation
   scopes: "entity.refreshSession.scopes", // OPTIONAL | path | used in JWT validation
   subject: "entity.refreshSession.accountId", // OPTIONAL | path | used in JWT validation
