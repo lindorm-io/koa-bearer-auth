@@ -12,10 +12,14 @@ interface MiddlewareOptions {
 }
 
 export interface BearerAuthOptions {
-  audience?: string;
+  audience?: Array<string>;
+  audiencePath?: string;
   nonce?: string;
-  scopes?: string;
+  noncePath?: string;
+  scopes?: Array<string>;
+  scopesPath?: string;
   subject?: string;
+  subjectPath?: string;
 }
 
 export const bearerAuthMiddleware =
@@ -25,7 +29,7 @@ export const bearerAuthMiddleware =
     const metric = ctx.getMetric("auth");
 
     const { clockTolerance, issuer, maxAge, type } = middlewareOptions;
-    const { audience, nonce, scopes, subject } = options;
+    const { audience, audiencePath, nonce, noncePath, scopes, scopesPath, subject, subjectPath } = options;
 
     const { type: tokenType, value: token } = ctx.getAuthorization() || {};
 
@@ -41,13 +45,13 @@ export const bearerAuthMiddleware =
 
     try {
       ctx.token.bearerToken = ctx.jwt.verify(token, {
-        audience: audience ? get(ctx, audience) : undefined,
+        audience: audiencePath ? get(ctx, audiencePath) : audience,
         clockTolerance,
         issuer,
         maxAge,
-        nonce: nonce ? get(ctx, nonce) : undefined,
-        scopes: scopes ? get(ctx, scopes) : undefined,
-        subject: subject ? get(ctx, subject) : undefined,
+        nonce: noncePath ? get(ctx, noncePath) : nonce,
+        scopes: scopesPath ? get(ctx, scopesPath) : scopes,
+        subject: subjectPath ? get(ctx, subjectPath) : subject,
         type: type || ["access_token"],
       });
 

@@ -11,6 +11,7 @@ const next = () => Promise.resolve();
 describe("bearerAuthMiddleware", () => {
   let middlewareOptions: any;
   let options: any;
+  let optionsPath: any;
   let ctx: any;
 
   beforeEach(() => {
@@ -29,10 +30,16 @@ describe("bearerAuthMiddleware", () => {
       maxAge: "90 minutes",
     };
     options = {
-      audience: "metadata.clientId",
-      nonce: "request.body.nonce",
-      scopes: "request.body.scopes",
-      subject: "request.body.subject",
+      audience: ["444a9836-d2c9-470e-9270-071bfcb61346"],
+      nonce: "6142a95bc7004df59e365e37516170a9",
+      scopes: ["default"],
+      subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
+    };
+    optionsPath = {
+      audiencePath: "metadata.clientId",
+      noncePath: "request.body.nonce",
+      scopesPath: "request.body.scopes",
+      subjectPath: "request.body.subject",
     };
 
     ctx = {
@@ -59,8 +66,20 @@ describe("bearerAuthMiddleware", () => {
     ctx.getMetric = (key: string) => new Metric(ctx, key);
   });
 
-  test("should successfully validate bearer token auth", async () => {
+  test("should successfully validate bearer token auth with options", async () => {
     await expect(bearerAuthMiddleware(middlewareOptions)(options)(ctx, next)).resolves.toBeUndefined();
+
+    expect(ctx.token.bearerToken).toStrictEqual(
+      expect.objectContaining({
+        subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
+        token: expect.any(String),
+      }),
+    );
+    expect(ctx.metrics.auth).toStrictEqual(expect.any(Number));
+  });
+
+  test("should successfully validate bearer token auth with path options", async () => {
+    await expect(bearerAuthMiddleware(middlewareOptions)(optionsPath)(ctx, next)).resolves.toBeUndefined();
 
     expect(ctx.token.bearerToken).toStrictEqual(
       expect.objectContaining({
