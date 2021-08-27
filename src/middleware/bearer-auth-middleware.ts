@@ -12,30 +12,30 @@ interface MiddlewareOptions {
 }
 
 export interface BearerAuthOptions {
-  audience: string;
-  audiences: Array<string>;
-  nonce: string;
-  permissions: Array<string>;
-  scopes: Array<string>;
-  subject: string;
-  subjectHint: string;
-  subjects: Array<string>;
+  audience?: string;
+  audiences?: Array<string>;
+  nonce?: string;
+  permissions?: Array<string>;
+  scopes?: Array<string>;
+  subject?: string;
+  subjectHint?: string;
+  subjects?: Array<string>;
 
-  fromPath: {
-    audience: string;
-    audiences: string;
-    nonce: string;
-    permissions: string;
-    scopes: string;
-    subjectHint: string;
-    subject: string;
-    subjects: string;
+  fromPath?: {
+    audience?: string;
+    audiences?: string;
+    nonce?: string;
+    permissions?: string;
+    scopes?: string;
+    subjectHint?: string;
+    subject?: string;
+    subjects?: string;
   };
 }
 
 export const bearerAuthMiddleware =
   (middlewareOptions: MiddlewareOptions) =>
-  (options: Partial<BearerAuthOptions> = {}): Middleware<BearerAuthContext> =>
+  (options: BearerAuthOptions = {}): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
