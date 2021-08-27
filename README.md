@@ -26,20 +26,28 @@ const middleware = bearerAuthMiddleware({
   clockTolerance: 3, // OPTIONAL | number | giving some tolerance for time validation
   issuer: "https://authorization.service/", // REQURIED | uri | used for token validation
   maxAge: "10 minutes", // OPTIONAL | string | used in JWT validation
-  type: "access_token", // OPTIONAL | string | token type
+  types: ["access_token"], // OPTIONAL | string | token type
 })
 
 router.use(middleware({
-  audiencePath: "metadata.clientId", // OPTIONAL | path to array | used in JWT validation 
-  noncePath: "entity.authorizationSession.nonce", // OPTIONAL | path to string | used in JWT validation
-  scopesPath: "entity.refreshSession.scopes", // OPTIONAL | path to array | used in JWT validation
-  subjectPath: "entity.refreshSession.accountId", // OPTIONAL | path to string | used in JWT validation
-}));
+  audience, // OPTIONAL [ string ]
+  audiences, // OPTIONAL [ Array<string> ]
+  nonce, // OPTIONAL [ string ]
+  permissions, // OPTIONAL [ Array<string> ]
+  scopes, // OPTIONAL [ Array<string> ]
+  subject, // OPTIONAL [ string ]
+  subjectHint, // OPTIONAL [ string ]
+  subjects, // OPTIONAL [ Array<string> ]
 
-router.use(middleware({
-  audience: ["444a9836-d2c9-470e-9270-071bfcb61346"], // OPTIONAL | Array<string> | used in JWT validation
-  nonce: "6142a95bc7004df59e365e37516170a9", // OPTIONAL | string | used in JWT validation
-  scopes: ["default"], // OPTIONAL | Array<string> | used in JWT validation
-  subject: "c57ed8ee-0797-44dd-921b-3db030879ec6", // OPTIONAL | string | used in JWT validation
+  fromPath: {
+    audience, // OPTIONAL [ string ] - path to string on ctx
+    audiences, // OPTIONAL [ string ] - path to Array<string> on ctx
+    nonce, // OPTIONAL [ string ] - path to string on ctx
+    permissions, // OPTIONAL [ string ] - path to Array<string> on ctx
+    scopes, // OPTIONAL [ string ] - path to Array<string> on ctx
+    subjectHint, // OPTIONAL [ string ] - path to string on ctx
+    subject, // OPTIONAL [ string ] - path to string on ctx
+    subjects, // OPTIONAL [ string ] - path to Array<string> on ctx
+  },
 }));
 ```

@@ -17,7 +17,7 @@ describe("bearerAuthMiddleware", () => {
   beforeEach(() => {
     const jwt = getTestJwt();
     const { token } = jwt.sign({
-      audience: ["444a9836-d2c9-470e-9270-071bfcb61346"],
+      audiences: ["444a9836-d2c9-470e-9270-071bfcb61346"],
       expiry: "99 seconds",
       nonce: "6142a95bc7004df59e365e37516170a9",
       scopes: ["default", "edit"],
@@ -30,7 +30,7 @@ describe("bearerAuthMiddleware", () => {
       maxAge: "90 minutes",
     };
     options = {
-      audience: ["444a9836-d2c9-470e-9270-071bfcb61346"],
+      audiences: ["444a9836-d2c9-470e-9270-071bfcb61346"],
       nonce: "6142a95bc7004df59e365e37516170a9",
       scopes: ["default"],
       subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",

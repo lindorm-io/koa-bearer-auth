@@ -8,28 +8,39 @@ interface MiddlewareOptions {
   clockTolerance?: number;
   issuer: string;
   maxAge?: string;
-  type?: Array<string>;
+  types?: Array<string>;
 }
 
 export interface BearerAuthOptions {
-  audience?: Array<string>;
-  audiencePath?: string;
-  nonce?: string;
-  noncePath?: string;
-  scopes?: Array<string>;
-  scopesPath?: string;
-  subject?: string;
-  subjectPath?: string;
+  audience: string;
+  audiences: Array<string>;
+  nonce: string;
+  permissions: Array<string>;
+  scopes: Array<string>;
+  subject: string;
+  subjectHint: string;
+  subjects: Array<string>;
+
+  fromPath: {
+    audience: string;
+    audiences: string;
+    nonce: string;
+    permissions: string;
+    scopes: string;
+    subjectHint: string;
+    subject: string;
+    subjects: string;
+  };
 }
 
 export const bearerAuthMiddleware =
   (middlewareOptions: MiddlewareOptions) =>
-  (options: BearerAuthOptions = {}): Middleware<BearerAuthContext> =>
+  (options: Partial<BearerAuthOptions> = {}): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
-    const { clockTolerance, issuer, maxAge, type } = middlewareOptions;
-    const { audience, audiencePath, nonce, noncePath, scopes, scopesPath, subject, subjectPath } = options;
+    const { clockTolerance, issuer, maxAge, types } = middlewareOptions;
+    const { audience, audiences, nonce, permissions, scopes, subject, subjectHint, subjects, fromPath } = options;
 
     const { type: tokenType, value: token } = ctx.getAuthorization() || {};
 
@@ -45,14 +56,18 @@ export const bearerAuthMiddleware =
 
     try {
       ctx.token.bearerToken = ctx.jwt.verify(token, {
-        audience: audiencePath ? get(ctx, audiencePath) : audience,
+        audience: fromPath?.audience ? get(ctx, fromPath.audience) : audience,
+        audiences: fromPath?.audiences ? get(ctx, fromPath.audiences) : audiences,
         clockTolerance,
         issuer,
         maxAge,
-        nonce: noncePath ? get(ctx, noncePath) : nonce,
-        scopes: scopesPath ? get(ctx, scopesPath) : scopes,
-        subject: subjectPath ? get(ctx, subjectPath) : subject,
-        type: type || ["access_token"],
+        nonce: fromPath?.nonce ? get(ctx, fromPath.nonce) : nonce,
+        permissions: fromPath?.permissions ? get(ctx, fromPath.permissions) : permissions,
+        scopes: fromPath?.scopes ? get(ctx, fromPath.scopes) : scopes,
+        subject: fromPath?.subject ? get(ctx, fromPath.subject) : subject,
+        subjects: fromPath?.subjects ? get(ctx, fromPath.subjects) : subjects,
+        subjectHint: fromPath?.subjectHint ? get(ctx, fromPath.subjectHint) : subjectHint,
+        types: types || ["access_token"],
       });
 
       ctx.logger.debug("Bearer token validated", {
