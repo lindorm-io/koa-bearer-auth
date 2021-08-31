@@ -40,9 +40,19 @@ export const bearerAuthMiddleware =
     const metric = ctx.getMetric("auth");
 
     const { clockTolerance, issuer, maxAge, types } = middlewareOptions;
-    const { audience, audiences, nonce, permissions, scopes, subject, subjectHint, subjects, fromPath } = options;
+    const {
+      audience,
+      audiences,
+      nonce,
+      permissions,
+      scopes,
+      subject,
+      subjectHint,
+      subjects,
+      fromPath,
+    } = options;
 
-    const { type: tokenType, value: token } = ctx.getAuthorization() || {};
+    const { type: tokenType, value: token } = ctx.getAuthorizationHeader() || {};
 
     if (tokenType !== "Bearer") {
       metric.end();
@@ -73,7 +83,7 @@ export const bearerAuthMiddleware =
       ctx.logger.debug("Bearer token validated", {
         bearerToken: TokenIssuer.sanitiseToken(token),
       });
-    } catch (err) {
+    } catch (err: any) {
       metric.end();
 
       throw new ClientError("Invalid Authorization", {

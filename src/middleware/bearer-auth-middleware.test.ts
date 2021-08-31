@@ -59,7 +59,7 @@ describe("bearerAuthMiddleware", () => {
       token: {},
     };
 
-    ctx.getAuthorization = () => ({
+    ctx.getAuthorizationHeader = () => ({
       type: "Bearer",
       value: token,
     });
@@ -67,7 +67,9 @@ describe("bearerAuthMiddleware", () => {
   });
 
   test("should successfully validate bearer token auth with options", async () => {
-    await expect(bearerAuthMiddleware(middlewareOptions)(options)(ctx, next)).resolves.toBeUndefined();
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)(options)(ctx, next),
+    ).resolves.toBeUndefined();
 
     expect(ctx.token.bearerToken).toStrictEqual(
       expect.objectContaining({
@@ -79,7 +81,9 @@ describe("bearerAuthMiddleware", () => {
   });
 
   test("should successfully validate bearer token auth with path options", async () => {
-    await expect(bearerAuthMiddleware(middlewareOptions)(optionsPath)(ctx, next)).resolves.toBeUndefined();
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)(optionsPath)(ctx, next),
+    ).resolves.toBeUndefined();
 
     expect(ctx.token.bearerToken).toStrictEqual(
       expect.objectContaining({
@@ -91,20 +95,24 @@ describe("bearerAuthMiddleware", () => {
   });
 
   test("should throw error on missing Bearer Token Auth", async () => {
-    ctx.getAuthorization = () => ({
+    ctx.getAuthorizationHeader = () => ({
       type: "Basic",
       value: "base64",
     });
 
-    await expect(bearerAuthMiddleware(middlewareOptions)(options)(ctx, next)).rejects.toThrow(ClientError);
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)(options)(ctx, next),
+    ).rejects.toThrow(ClientError);
   });
 
   test("should throw error on erroneous token verification", async () => {
-    ctx.getAuthorization = () => ({
+    ctx.getAuthorizationHeader = () => ({
       type: "Bearer",
       value: "jwt.jwt.jwt",
     });
 
-    await expect(bearerAuthMiddleware(middlewareOptions)(options)(ctx, next)).rejects.toThrow(ClientError);
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)(options)(ctx, next),
+    ).rejects.toThrow(ClientError);
   });
 });
