@@ -1,8 +1,8 @@
-import { BearerAuthContext } from "../types";
+import { BearerAuthContext, CustomValidation } from "../types";
 import { ClientError } from "@lindorm-io/errors";
 import { Middleware } from "@lindorm-io/koa";
 import { TokenIssuer } from "@lindorm-io/jwt";
-import { get } from "lodash";
+import { get, isFunction } from "lodash";
 
 interface MiddlewareOptions {
   clockTolerance?: number;
@@ -35,7 +35,10 @@ export interface BearerAuthOptions {
 
 export const bearerAuthMiddleware =
   (middlewareOptions: MiddlewareOptions) =>
-  (options: BearerAuthOptions = {}): Middleware<BearerAuthContext> =>
+  (
+    options: BearerAuthOptions = {},
+    customValidation?: CustomValidation,
+  ): Middleware<BearerAuthContext> =>
   async (ctx, next): Promise<void> => {
     const metric = ctx.getMetric("auth");
 
@@ -79,6 +82,10 @@ export const bearerAuthMiddleware =
         subjectHint: fromPath?.subjectHint ? get(ctx, fromPath.subjectHint) : subjectHint,
         types: types || ["access_token"],
       });
+
+      if (isFunction(customValidation)) {
+        await customValidation(ctx, ctx.token.bearerToken);
+      }
 
       ctx.logger.debug("Bearer token validated", {
         bearerToken: TokenIssuer.sanitiseToken(token),

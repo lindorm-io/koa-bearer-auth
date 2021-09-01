@@ -94,6 +94,18 @@ describe("bearerAuthMiddleware", () => {
     expect(ctx.metrics.auth).toStrictEqual(expect.any(Number));
   });
 
+  test("should successfully validate bearer token with custom validation callback", async () => {
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)({}, async (context, verifyData) => {
+        if (verifyData.subject !== "c57ed8ee-0797-44dd-921b-3db030879ec6") {
+          throw Error("message");
+        }
+      })(ctx, next),
+    ).resolves.toBeUndefined();
+
+    expect(ctx.token.bearerToken).toBeTruthy();
+  });
+
   test("should throw error on missing Bearer Token Auth", async () => {
     ctx.getAuthorizationHeader = () => ({
       type: "Basic",
@@ -113,6 +125,18 @@ describe("bearerAuthMiddleware", () => {
 
     await expect(
       bearerAuthMiddleware(middlewareOptions)(options)(ctx, next),
+    ).rejects.toThrow(ClientError);
+  });
+
+  test("should throw error with custom validation callback", async () => {
+    await expect(
+      bearerAuthMiddleware(middlewareOptions)({}, async (context) => {
+        if (
+          context.token.bearerToken.subject === "c57ed8ee-0797-44dd-921b-3db030879ec6"
+        ) {
+          throw Error("message");
+        }
+      })(ctx, next),
     ).rejects.toThrow(ClientError);
   });
 });
