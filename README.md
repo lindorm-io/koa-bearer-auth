@@ -24,8 +24,10 @@ Once the token issuer exists on the context, the middleware is ready to be used
 ```typescript
 const middleware = bearerAuthMiddleware({
   clockTolerance: 3, // OPTIONAL | number | giving some tolerance for time validation
+  contextKey: "tokenKey", // OPTIONAL | string | used to set validated token on context (ctx.token.tokenKey)
   issuer: "https://authorization.service/", // REQURIED | uri | used for token validation
   maxAge: "10 minutes", // OPTIONAL | string | used in JWT validation
+  subjectHint: "identity", // OPTIONAL [ string ]
   types: ["access_token"], // OPTIONAL | string | token type
 })
 
@@ -36,7 +38,6 @@ router.use(middleware({
   permissions, // OPTIONAL [ Array<string> ]
   scopes, // OPTIONAL [ Array<string> ]
   subject, // OPTIONAL [ string ]
-  subjectHint, // OPTIONAL [ string ]
   subjects, // OPTIONAL [ Array<string> ]
 
   fromPath: {
@@ -45,7 +46,6 @@ router.use(middleware({
     nonce, // OPTIONAL [ string ] - path to string on ctx
     permissions, // OPTIONAL [ string ] - path to Array<string> on ctx
     scopes, // OPTIONAL [ string ] - path to Array<string> on ctx
-    subjectHint, // OPTIONAL [ string ] - path to string on ctx
     subject, // OPTIONAL [ string ] - path to string on ctx
     subjects, // OPTIONAL [ string ] - path to Array<string> on ctx
   },

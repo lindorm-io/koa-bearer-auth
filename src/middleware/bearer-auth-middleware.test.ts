@@ -22,12 +22,14 @@ describe("bearerAuthMiddleware", () => {
       nonce: "6142a95bc7004df59e365e37516170a9",
       scopes: ["default", "edit"],
       subject: "c57ed8ee-0797-44dd-921b-3db030879ec6",
+      subjectHint: "identity",
       type: "access_token",
     });
 
     middlewareOptions = {
       issuer: "issuer",
       maxAge: "90 minutes",
+      subjectHint: "identity",
     };
     options = {
       audiences: ["444a9836-d2c9-470e-9270-071bfcb61346"],
