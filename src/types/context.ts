@@ -3,7 +3,5 @@ import { KoaContext } from "@lindorm-io/koa";
 
 export interface BearerAuthContext extends KoaContext {
   jwt: TokenIssuer;
-  token: {
-    bearerToken: IssuerVerifyData<never, never>;
-  };
+  token: Record<string, IssuerVerifyData<unknown, unknown>>;
 }
